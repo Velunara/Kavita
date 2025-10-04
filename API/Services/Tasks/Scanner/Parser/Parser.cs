@@ -445,6 +445,10 @@ public static partial class Parser
         new Regex(
             @"(?<Series>.*)(\b|_)(vol\.? ?)(?<Volume>\d+(\.\d)?(-\d+)?(\.\d)?)",
             MatchOptions, RegexTimeout),
+        // Ascendance of a Bookworm - Volume 05.4
+        new Regex(
+            @"(?<Series>.*)(\b|_)(\s?-\s?)?(Volume\.? ?)(?<Volume>\d+(\.\d)?(-\d+)?(\.\d)?)",
+            MatchOptions, RegexTimeout),
         // Killing Bites Vol. 0001 Ch. 0001 - Galactica Scanlations (gb)
         new Regex(
             @"(vol\.? ?)(?<Volume>\d+(\.\d)?)",
@@ -453,7 +457,7 @@ public static partial class Parser
         new Regex(
             @"((volume|tome)\s)(?<Volume>\d+(\.\d)?)",
             MatchOptions, RegexTimeout),
-            // Tower Of God S01 014 (CBT) (digital).cbz, Tower Of God T01 014 (CBT) (digital).cbz,
+        // Tower Of God S01 014 (CBT) (digital).cbz, Tower Of God T01 014 (CBT) (digital).cbz,
         new Regex(
             @"(?<Series>.*)(\b|_)((S|T)(?<Volume>\d+)(\b|_))",
             MatchOptions, RegexTimeout),
