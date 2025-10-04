@@ -42,7 +42,7 @@ public static partial class Parser
     private static readonly ImmutableArray<string> FormatTagSpecialKeywords = ImmutableArray.Create(
         "Special", "Reference", "Director's Cut", "Box Set", "Box-Set", "Annual", "Anthology", "Epilogue",
         "One Shot", "One-Shot", "Prologue", "TPB", "Trade Paper Back", "Omnibus", "Compendium", "Absolute", "Graphic Novel",
-        "GN", "FCBD", "Giant Size");
+        "GN", "FCBD", "Giant Size", "Side Stories");
 
     private static readonly char[] LeadingZeroesTrimChars = ['0'];
 
