@@ -7,7 +7,7 @@ public class BookParser(IDirectoryService directoryService, IBookService bookSer
 {
     public override ParserInfo Parse(string filePath, string rootPath, string libraryRoot, LibraryType type, bool enableMetadata = true, ComicInfo comicInfo = null)
     {
-        var info = bookService.ParseInfo(filePath);
+        var info = bookService.ParseInfo(filePath, rootPath, libraryRoot, type);
         if (info == null) return null;
 
         info.ComicInfo = comicInfo;

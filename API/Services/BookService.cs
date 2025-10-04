@@ -41,7 +41,7 @@ public interface IBookService
     int GetNumberOfPages(string filePath);
     string GetCoverImage(string fileFilePath, string fileName, string outputDirectory, EncodeFormat encodeFormat, CoverImageSize size = CoverImageSize.Default);
     ComicInfo? GetComicInfo(string filePath);
-    ParserInfo? ParseInfo(string filePath);
+    ParserInfo? ParseInfo(string filePath, string rootPath, string libraryRoot, LibraryType type);
     /// <summary>
     /// Scopes styles to .reading-section and replaces img src to the passed apiBase
     /// </summary>
@@ -692,6 +692,8 @@ public partial class BookService : IBookService
                 info.Volume = Parser.ParseVolume(info.Title, LibraryType.Manga);
             }
 
+            info.Series = GuessSeriesFromStructure(filePath, info.Series);
+
             return info;
         }
         catch (Exception ex)
@@ -737,7 +739,10 @@ public partial class BookService : IBookService
 
         if (Parser.IsPdf(filePath))
         {
-            return _pdfComicInfoExtractor.GetComicInfo(filePath);
+            var comicInfo = _pdfComicInfoExtractor.GetComicInfo(filePath);
+            if (comicInfo != null)
+                comicInfo.Series = GuessSeriesFromStructure(filePath, comicInfo.Series);
+            return comicInfo;
         }
 
         return GetEpubComicInfo(filePath);
@@ -1106,7 +1111,7 @@ public partial class BookService : IBookService
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public ParserInfo? ParseInfo(string filePath)
+    public ParserInfo? ParseInfo(string filePath, string rootPath, string libraryRoot, LibraryType type)
     {
         if (!Parser.IsEpub(filePath) || !_directoryService.FileSystem.File.Exists(filePath)) return null;
 
@@ -1190,6 +1195,9 @@ public partial class BookService : IBookService
                 // Swallow exception
             }
 
+            var possibleSeries = Parser.ParseSeries(epubBook.Title, type);
+            possibleSeries = GuessSeriesFromStructure(filePath, possibleSeries);
+
             return new ParserInfo
             {
                 Chapters = Parser.DefaultChapter,
@@ -1199,8 +1207,8 @@ public partial class BookService : IBookService
                 Title = epubBook.Title.Trim(),
                 FullFilePath = Parser.NormalizePath(filePath),
                 IsSpecial = Parser.HasSpecialMarker(filePath),
-                Series = epubBook.Title.Trim(),
-                Volumes = Parser.LooseLeafVolume,
+                Series = possibleSeries,
+                Volumes = Parser.ParseVolume(Path.GetFileNameWithoutExtension(filePath), type),
             };
         }
         catch (Exception ex)
@@ -1211,6 +1219,26 @@ public partial class BookService : IBookService
         }
 
         return null;
+    }
+
+    private string GuessSeriesFromStructure(string filePath, string? previousGuess = null, LibraryType type = LibraryType.Manga)
+    {
+        previousGuess ??= Parser.ParseSeries(Path.GetFileNameWithoutExtension(filePath), type);
+        var parents = filePath.Split('/'); // TODO: Verify: Will this always be forward slash?
+
+        // Check that we have at least 2 parents (library root + series)
+        if (parents.Length < 2) return string.Empty;
+
+        // Check if previous guess is in the path
+        foreach (var parent in parents)
+        {
+            if (previousGuess.StartsWith(parent, StringComparison.OrdinalIgnoreCase))
+            {
+                return parent;
+            }
+        }
+
+        return previousGuess; // If nothing found, return previous guess
     }
 
     /// <summary>
