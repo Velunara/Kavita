@@ -728,6 +728,7 @@ public static partial class Parser
     public static bool HasSpecialMarker(string? filePath)
     {
         if (string.IsNullOrEmpty(filePath)) return false;
+        if (Path.GetFileName(Path.GetDirectoryName(filePath))?.StartsWith('!') == true) return true;
         return SpecialMarkerRegex.IsMatch(filePath);
     }
 
