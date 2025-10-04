@@ -41,7 +41,7 @@ public class PdfParser(IDirectoryService directoryService) : DefaultParser(direc
             ret.Edition = edition;
         }
 
-        var isSpecial = Parser.IsSpecial(fileName, type);
+        var isSpecial = Parser.IsSpecial(filePath, type);
         // We must ensure that we can only parse a special out. As some files will have v20 c171-180+Omake and that
         // could cause a problem as Omake is a special term, but there is valid volume/chapter information.
         if (ret.Chapters == Parser.DefaultChapter && ret.Volumes == Parser.LooseLeafVolume && isSpecial)
@@ -52,7 +52,7 @@ public class PdfParser(IDirectoryService directoryService) : DefaultParser(direc
         }
 
         // If we are a special with marker, we need to ensure we use the correct series name. we can do this by falling back to Folder name
-        if (Parser.HasSpecialMarker(fileName))
+        if (Parser.HasSpecialMarker(filePath))
         {
             ret.IsSpecial = true;
             ret.SpecialIndex = Parser.ParseSpecialIndex(fileName);

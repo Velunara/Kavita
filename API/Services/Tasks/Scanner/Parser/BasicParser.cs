@@ -58,7 +58,7 @@ public class BasicParser(IDirectoryService directoryService, IDefaultParser imag
         }
 
         // If we are a special with marker, we need to ensure we use the correct series name. we can do this by falling back to Folder name
-        if (Parser.HasSpecialMarker(fileName))
+        if (Parser.HasSpecialMarker(filePath))
         {
             ret.IsSpecial = true;
             ret.SpecialIndex = Parser.ParseSpecialIndex(fileName);
